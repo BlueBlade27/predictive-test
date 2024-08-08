@@ -1,30 +1,4 @@
-let words = [
-    "Apple",
-    "Pencil",
-    "Pen",
-    "Chair",
-    "Helmet",
-    "Grapes",
-    "Tub",
-    "Trophy",
-    "Cookie",
-    "Donut",
-    "Shirt",
-    "Bat",
-    "Ash",
-    "Bell",
-    "Chat",
-    "Ball",
-    "Eye",
-    "Fish",
-    "Zip",
-    "Game",
-    "Juice",
-    "Orange",
-    "Fan",
-    "Ice",
-  ];
-  words.sort();
+
   let input = document.getElementById("input");
   let suggestion = document.getElementById("suggestion");
   //Enter key code
@@ -60,23 +34,27 @@ let words = [
     return word.join("");
   };
   
-  //Execute function on input
-  input.addEventListener("input", (e) => {
-    clearSuggestion();
-    //Convert input value to regex since string.startsWith() is case sensitive
-    let regex = new RegExp("^" + input.value, "i");
-    //loop through words array
-    for (let i in words) {
-      //check if input matches with any word in words array
-      if (regex.test(words[i]) && input.value != "") {
-        //Change case of word in words array according to user input
-        words[i] = caseCheck(words[i]);
-        //display suggestion
-        suggestion.innerHTML = words[i];
-        break;
-      }
-    }
-  });
+
+ input.addEventListener("input", (e) => {
+  clearSuggestion();
+  console.log("User input:", input.value); // Debugging line
+  if (input.value != "") {
+    fetch(`https://api.datamuse.com/sug?s=${input.value}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log("API Response:", data); // Debugging line
+        if (data.length > 0) {
+          let suggestedWord = data[0].word;
+          console.log("Suggested word before caseCheck:", suggestedWord); // Debugging line
+          suggestedWord = caseCheck(suggestedWord);
+          console.log("Suggested word after caseCheck:", suggestedWord); // Debugging line
+          suggestion.innerHTML = suggestedWord;
+        }
+      })
+      .catch(error => console.error('Error fetching data:', error)); // Debugging line
+  }
+});
+
   
   //Complete predictive text on enter key
   input.addEventListener("keydown", (e) => {
